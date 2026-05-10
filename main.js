@@ -29,37 +29,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Testimonials Carousel Controls
-    const slider = document.getElementById('reviewSlider');
+    // Testimonials Carousel — Transform-based infinite loop
+    const track = document.getElementById('carouselTrack');
     const prevBtn = document.querySelector('.prev-btn');
     const nextBtn = document.querySelector('.next-btn');
+    const dotsContainer = document.getElementById('carouselDots');
 
-    if(slider && prevBtn && nextBtn) {
-        prevBtn.addEventListener('click', () => {
-            const cardWidth = slider.querySelector('.review-card').offsetWidth;
-            const gap = parseFloat(window.getComputedStyle(slider.querySelector('.testimonial-track')).gap) || 0;
-            const scrollAmount = cardWidth + gap;
-            
-            // If at the beginning, rewind to the end
-            if (slider.scrollLeft <= 5) {
-                slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
-            } else {
-                slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            }
+    if (track && prevBtn && nextBtn && dotsContainer) {
+        const cards = Array.from(track.children);
+        const total = cards.length;
+        let currentIndex = 0;
+
+        // Build dot indicators
+        cards.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.classList.add('carousel-dot');
+            dot.setAttribute('aria-label', `Go to review ${i + 1}`);
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goTo(i));
+            dotsContainer.appendChild(dot);
         });
-        
-        nextBtn.addEventListener('click', () => {
-            const cardWidth = slider.querySelector('.review-card').offsetWidth;
-            const gap = parseFloat(window.getComputedStyle(slider.querySelector('.testimonial-track')).gap) || 0;
-            const scrollAmount = cardWidth + gap;
-            
-            // If at the end, rewind to the beginning
-            if (slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 5) {
-                slider.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+
+        function updateDots() {
+            dotsContainer.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function goTo(index) {
+            currentIndex = ((index % total) + total) % total;
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            updateDots();
+        }
+
+        prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+        // Touch / swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        track.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        track.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goTo(currentIndex + 1);
+                else goTo(currentIndex - 1);
             }
-        });
+        }, { passive: true });
     }
 
     // 2. Smooth Scrolling for Anchor Links
