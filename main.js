@@ -29,6 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Testimonials Carousel Controls
+    const slider = document.getElementById('reviewSlider');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+
+    if(slider && prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            const cardWidth = slider.querySelector('.review-card').offsetWidth;
+            const gap = parseFloat(window.getComputedStyle(slider.querySelector('.testimonial-track')).gap) || 0;
+            const scrollAmount = cardWidth + gap;
+            
+            // If at the beginning, rewind to the end
+            if (slider.scrollLeft <= 5) {
+                slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
+            } else {
+                slider.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            const cardWidth = slider.querySelector('.review-card').offsetWidth;
+            const gap = parseFloat(window.getComputedStyle(slider.querySelector('.testimonial-track')).gap) || 0;
+            const scrollAmount = cardWidth + gap;
+            
+            // If at the end, rewind to the beginning
+            if (slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 5) {
+                slider.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        });
+    }
+
     // 2. Smooth Scrolling for Anchor Links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
