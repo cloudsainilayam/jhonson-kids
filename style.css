@@ -385,7 +385,8 @@ p {
 }
 
 @media (max-width: 968px) {
-  .hero-subtitle { margin: 0 auto var(--space-lg); }
+  .hero { padding: 120px 0 60px; }
+  .hero-subtitle { margin: 0 auto var(--space-sm); }
   .hero-cta-group { justify-content: center; }
   .hero-visual { display: none; }
 }
